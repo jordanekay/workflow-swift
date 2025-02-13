@@ -24,26 +24,6 @@ let package = Package(
         .singleTargetLibrary("WorkflowUI"),
         .singleTargetLibrary("WorkflowSwiftUI"),
 
-        // MARK: WorkflowReactiveSwift
-
-        .singleTargetLibrary("WorkflowReactiveSwift"),
-        .singleTargetLibrary("WorkflowReactiveSwiftTesting"),
-
-        // MARK: WorkflowRxSwift
-
-        .singleTargetLibrary("WorkflowRxSwift"),
-        .singleTargetLibrary("WorkflowRxSwiftTesting"),
-
-        // MARK: WorkflowCombine
-
-        .singleTargetLibrary("WorkflowCombine"),
-        .singleTargetLibrary("WorkflowCombineTesting"),
-
-        // MARK: WorkflowConcurrency
-
-        .singleTargetLibrary("WorkflowConcurrency"),
-        .singleTargetLibrary("WorkflowConcurrencyTesting"),
-
         // MARK: ViewEnvironment
 
         .singleTargetLibrary("ViewEnvironment"),
@@ -51,14 +31,9 @@ let package = Package(
         // MARK: ViewEnvironmentUI
 
         .singleTargetLibrary("ViewEnvironmentUI"),
-
-        // MARK: WorkflowSwiftUIExperimental
-
-        .singleTargetLibrary("WorkflowSwiftUIExperimental"),
     ],
     dependencies: [
         .package(url: "https://github.com/ReactiveCocoa/ReactiveSwift.git", from: "7.1.1"),
-        .package(url: "https://github.com/ReactiveX/RxSwift.git", from: "6.6.0"),
         .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0" ..< "601.0.0-prerelease"),
         .package(url: "https://github.com/pointfreeco/swift-case-paths", from: "1.1.0"),
         .package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "1.0.0"),
@@ -167,78 +142,6 @@ let package = Package(
             path: "WorkflowReactiveSwift/TestingTests"
         ),
 
-        // MARK: WorkflowRxSwift
-
-        .target(
-            name: "WorkflowRxSwift",
-            dependencies: ["RxSwift", "Workflow"],
-            path: "WorkflowRxSwift/Sources"
-        ),
-        .testTarget(
-            name: "WorkflowRxSwiftTests",
-            dependencies: ["WorkflowRxSwiftTesting", "WorkflowReactiveSwift"],
-            path: "WorkflowRxSwift/Tests"
-        ),
-        .target(
-            name: "WorkflowRxSwiftTesting",
-            dependencies: ["WorkflowRxSwift", "WorkflowTesting"],
-            path: "WorkflowRxSwift/Testing",
-            linkerSettings: [.linkedFramework("XCTest")]
-        ),
-        .testTarget(
-            name: "WorkflowRxSwiftTestingTests",
-            dependencies: ["WorkflowRxSwiftTesting"],
-            path: "WorkflowRxSwift/TestingTests"
-        ),
-
-        // MARK: WorkflowCombine
-
-        .target(
-            name: "WorkflowCombine",
-            dependencies: ["Workflow"],
-            path: "WorkflowCombine/Sources"
-        ),
-        .testTarget(
-            name: "WorkflowCombineTests",
-            dependencies: ["WorkflowCombineTesting"],
-            path: "WorkflowCombine/Tests"
-        ),
-        .target(
-            name: "WorkflowCombineTesting",
-            dependencies: ["WorkflowCombine", "WorkflowTesting"],
-            path: "WorkflowCombine/Testing",
-            linkerSettings: [.linkedFramework("XCTest")]
-        ),
-        .testTarget(
-            name: "WorkflowCombineTestingTests",
-            dependencies: ["WorkflowCombineTesting"],
-            path: "WorkflowCombine/TestingTests"
-        ),
-
-        // MARK: WorkflowConcurrency
-
-        .target(
-            name: "WorkflowConcurrency",
-            dependencies: ["Workflow"],
-            path: "WorkflowConcurrency/Sources"
-        ),
-        .testTarget(
-            name: "WorkflowConcurrencyTests",
-            dependencies: ["WorkflowConcurrency", "Workflow", "WorkflowTesting"],
-            path: "WorkflowConcurrency/Tests"
-        ),
-        .target(
-            name: "WorkflowConcurrencyTesting",
-            dependencies: ["WorkflowConcurrency", "WorkflowTesting"],
-            path: "WorkflowConcurrency/Testing",
-            linkerSettings: [.linkedFramework("XCTest")]
-        ),
-        .testTarget(
-            name: "WorkflowConcurrencyTestingTests",
-            dependencies: ["WorkflowConcurrencyTesting"],
-            path: "WorkflowConcurrency/TestingTests"
-        ),
-
         // MARK: ViewEnvironment
 
         .target(
@@ -252,20 +155,7 @@ let package = Package(
             name: "ViewEnvironmentUI",
             dependencies: ["ViewEnvironment"],
             path: "ViewEnvironmentUI/Sources"
-        ),
-
-        // MARK: WorkflowSwiftUIExperimental
-
-        .target(
-            name: "WorkflowSwiftUIExperimental",
-            dependencies: ["Workflow", "WorkflowUI"],
-            path: "WorkflowSwiftUIExperimental/Sources"
-        ),
-        .testTarget(
-            name: "WorkflowSwiftUIExperimentalTests",
-            dependencies: ["WorkflowSwiftUIExperimental", "Workflow", "WorkflowUI"],
-            path: "WorkflowSwiftUIExperimental/Tests"
-        ),
+        )
     ],
     swiftLanguageVersions: [.v5]
 )
