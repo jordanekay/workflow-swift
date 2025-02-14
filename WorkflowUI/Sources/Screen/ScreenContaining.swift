@@ -1,7 +1,4 @@
-#if canImport(UIKit)
-
 import Foundation
-import UIKit
 
 /// Defines a type that semantically 'contains' a `Screen` instance.
 ///
@@ -46,5 +43,3 @@ extension SingleScreenContaining {
         return result
     }
 }
-
-#endif

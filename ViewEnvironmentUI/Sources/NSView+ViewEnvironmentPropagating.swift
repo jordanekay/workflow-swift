@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-import Foundation
+#if canImport(AppKit)
 
-/// Protocol to observe events emitted from WorkflowUI.
-/// **N.B. This is currently part of an experimental interface, and may have breaking changes in the future.**
-@_spi(ExperimentalObservation)
-public protocol WorkflowUIObserver {
-    func observeEvent<E: WorkflowUIEvent>(_ event: E)
+import AppKit
+import ViewEnvironment
+
+extension NSView: ViewEnvironmentPropagating {
+    @_spi(ViewEnvironmentWiring)
+    public var defaultEnvironmentAncestor: ViewEnvironmentPropagating? { superview }
+
+    @_spi(ViewEnvironmentWiring)
+    public var defaultEnvironmentDescendants: [ViewEnvironmentPropagating] { subviews }
+
+    @_spi(ViewEnvironmentWiring)
+    public func setNeedsApplyEnvironment() {
+        needsLayout = true
+    }
 }
 
-// MARK: - Global Observation
-
-@_spi(ExperimentalObservation)
-public enum WorkflowUIObservation {
-    /// The shared `WorkflowUIObserver` instance to which all `WorkflowUIEvent`s will be forwarded.
-    public static var sharedUIObserver: WorkflowUIObserver?
-}
+#endif

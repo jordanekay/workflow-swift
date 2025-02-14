@@ -18,6 +18,16 @@
 
 import UIKit
 
+public typealias ViewController = UIViewController
+
+#elseif canImport(AppKit)
+
+import AppKit
+
+public typealias ViewController = NSViewController
+
+#endif
+
 /// Screens are the building blocks of an interactive application.
 ///
 /// Conforming types contain any information needed to populate a screen: data,
@@ -32,7 +42,7 @@ extension Screen {
     /// If the given view controller is of the correct type to be updated by this screen.
     ///
     /// If your view controller type can change between updates, call this method before invoking `update(viewController:with:)`.
-    public func canUpdate(viewController: UIViewController, with environment: ViewEnvironment) -> Bool {
+    public func canUpdate(viewController: ViewController, with environment: ViewEnvironment) -> Bool {
         viewControllerDescription(environment: environment).canUpdate(viewController: viewController)
     }
 
@@ -41,15 +51,13 @@ extension Screen {
     /// ### Note
     /// You must pass a view controller previously created by a compatible `ViewControllerDescription`
     /// that passes `canUpdate(viewController:with:)`. Failure to do so will result in a fatal precondition.
-    public func update(viewController: UIViewController, with environment: ViewEnvironment) {
+    public func update(viewController: ViewController, with environment: ViewEnvironment) {
         viewControllerDescription(environment: environment).update(viewController: viewController)
     }
 
     /// Construct and update a new view controller as described by this Screen.
     /// The view controller will be updated before it is returned, so it is fully configured and prepared for display.
-    public func buildViewController(in environment: ViewEnvironment) -> UIViewController {
+    public func buildViewController(in environment: ViewEnvironment) -> ViewController {
         viewControllerDescription(environment: environment).buildViewController()
     }
 }
-
-#endif

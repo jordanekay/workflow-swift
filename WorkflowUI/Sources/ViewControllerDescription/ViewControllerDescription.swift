@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-#if canImport(UIKit)
-
-import UIKit
 import ViewEnvironment
 @_spi(ViewEnvironmentWiring) import ViewEnvironmentUI
 
-/// A ViewControllerDescription acts as a "recipe" for building and updating a specific `UIViewController`.
+/// A ViewControllerDescription acts as a "recipe" for building and updating a specific `ViewController`.
 /// It describes how to _create_ and later _update_ a given view controller instance, without creating one
 /// itself. This means it is a lightweight currency you can create and pass around to describe a view controller,
 /// without needing to create one.
@@ -45,15 +42,15 @@ public struct ViewControllerDescription {
     /// duplicate updates to your children if they are created in `init`.
     public var performInitialUpdate: Bool
 
-    /// Describes the `UIViewController` type that backs the `ViewControllerDescription`
+    /// Describes the `ViewController` type that backs the `ViewControllerDescription`
     /// in a way that is `Equatable` and `Hashable`. When implementing view controller
     /// updating and diffing, you can use this type to identify if the backing view controller
     /// type changed.
     public let kind: KindIdentifier
 
     private let environment: ViewEnvironment
-    private let build: () -> UIViewController
-    private let update: (UIViewController) -> Void
+    private let build: () -> ViewController
+    private let update: (ViewController) -> Void
 
     /// Constructs a view controller description by providing closures used to
     /// build and update a specific view controller type.
@@ -75,7 +72,7 @@ public struct ViewControllerDescription {
     ///   - build: Closure that produces a new instance of the view controller
     ///
     ///   - update: Closure that updates the given view controller
-    public init<VC: UIViewController>(
+    public init<VC: ViewController>(
         performInitialUpdate: Bool = true,
         type: VC.Type = VC.self,
         environment: ViewEnvironment,
@@ -101,7 +98,7 @@ public struct ViewControllerDescription {
 
     /// Construct and update a new view controller as described by this view controller description.
     /// The view controller will be updated before it is returned, so it is fully configured and prepared for display.
-    public func buildViewController() -> UIViewController {
+    public func buildViewController() -> ViewController {
         let viewController = build()
 
         if performInitialUpdate {
@@ -118,7 +115,7 @@ public struct ViewControllerDescription {
     /// If the given view controller is of the correct type to be updated by this view controller description.
     ///
     /// If your view controller type can change between updates, call this method before invoking `update(viewController:)`.
-    public func canUpdate(viewController: UIViewController) -> Bool {
+    public func canUpdate(viewController: ViewController) -> Bool {
         kind.canUpdate(viewController: viewController)
     }
 
@@ -130,7 +127,7 @@ public struct ViewControllerDescription {
     /// ### Note
     /// You must pass a view controller previously created by a compatible `ViewControllerDescription`
     /// that passes `canUpdate(viewController:)`. Failure to do so will result in a fatal precondition.
-    public func update(viewController: UIViewController) {
+    public func update(viewController: ViewController) {
         precondition(
             canUpdate(viewController: viewController),
             """
@@ -145,7 +142,7 @@ public struct ViewControllerDescription {
         update(viewController)
     }
 
-    private func configureAncestor(of viewController: UIViewController) {
+    private func configureAncestor(of viewController: ViewController) {
         guard let ancestorOverride = viewController.environmentAncestorOverride else {
             // If no ancestor is currently present establish the initial ancestor override.
             //
@@ -180,17 +177,17 @@ public struct ViewControllerDescription {
 }
 
 extension ViewControllerDescription {
-    /// Describes the `UIViewController` type that backs the `ViewControllerDescription`
+    /// Describes the `ViewController` type that backs the `ViewControllerDescription`
     /// in a way that is `Equatable` and `Hashable`. When implementing view controller
     /// updating and diffing, you can use this type to identify if the backing view controller
     /// type changed.
     public struct KindIdentifier: Hashable {
-        fileprivate let viewControllerType: UIViewController.Type
+        fileprivate let viewControllerType: ViewController.Type
 
-        private let checkViewControllerType: (UIViewController) -> Bool
+        private let checkViewControllerType: (ViewController) -> Bool
 
         /// Creates a new kind for the given view controller type.
-        public init<VC: UIViewController>(_ kind: VC.Type) {
+        public init<VC: ViewController>(_ kind: VC.Type) {
             self.viewControllerType = VC.self
 
             self.checkViewControllerType = { $0 is VC }
@@ -199,7 +196,7 @@ extension ViewControllerDescription {
         /// If the given view controller is of the correct type to be updated by this view controller description.
         ///
         /// If your view controller type can change between updates, call this method before invoking `update(viewController:)`.
-        public func canUpdate(viewController: UIViewController) -> Bool {
+        public func canUpdate(viewController: ViewController) -> Bool {
             checkViewControllerType(viewController)
         }
 
@@ -222,12 +219,12 @@ extension ViewControllerDescription {
         // Since the viewController retains a reference to this node (via capture in the `environmentAncestorOverride`
         // closure) we use a weak reference here to avoid a retain cycle, and leave retainment of the view controller
         // up to the consumer of the `ViewControllerDescription` (e.g. the parent view controller).
-        weak var viewController: UIViewController?
+        weak var viewController: ViewController?
 
         var environment: ViewEnvironment
 
         init(
-            viewController: UIViewController,
+            viewController: ViewController,
             environment: ViewEnvironment
         ) {
             self.viewController = viewController
@@ -251,5 +248,3 @@ extension ViewControllerDescription {
         }
     }
 }
-
-#endif

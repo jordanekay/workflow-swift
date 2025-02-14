@@ -121,4 +121,94 @@ public protocol UpdateChildScreenViewController {}
 
 extension UIViewController: UpdateChildScreenViewController {}
 
+#elseif canImport(AppKit)
+
+import AppKit
+
+extension UpdateChildScreenViewController where Self: NSViewController {
+    /// Updates the view controller at the given `child` key path with the
+    /// `ViewControllerDescription` from `screen`. If the type of the underlying view
+    /// controller changes between update passes, this method will remove
+    /// the old view controller, create a new one, update it, and insert it into the view controller hierarchy.
+    ///
+    /// The view controller at `child` must be a child of `self`.
+    ///
+    /// - Parameters:
+    /// - parameter child: The `KeyPath` which describes what view controller to update. This view controller must be a direct child of `self`.
+    /// - parameter screen: The `Screen` instance to apply to the view controller.
+    /// - parameter environment: The `environment` to used when updating the view controller.
+    /// - parameter onChange: A callback called if the view controller instance changed.
+    ///
+    public func update<VC: NSViewController>(
+        child: ReferenceWritableKeyPath<Self, VC>,
+        with screen: some Screen,
+        in environment: ViewEnvironment,
+        onChange: (VC) -> Void = { _ in }
+    ) {
+        let description = screen.viewControllerDescription(environment: environment)
+
+        let existing = self[keyPath: child]
+
+        if description.canUpdate(viewController: existing) {
+            // Easy path: Just update the existing view controller if we can do that.
+            description.update(viewController: existing)
+        } else {
+            // If we can't update the view controller, that means its type changed.
+            // We'll need to make a new view controller and swap over to it.
+
+            let old = existing
+
+            // Make the new view controller.
+
+            let new = description.buildViewController() as! VC
+
+            // We already have a reference to the old vc above, update the keypath to the new one.
+
+            self[keyPath: child] = new
+
+            // We should only add the view controller if the old one was already within the parent.
+
+            if let parent = old.parent {
+                precondition(
+                    parent == self,
+                    """
+                    The parent of the child view controller must be \(self). Instead, it was \(parent). \
+                    Please call `update(child:)` on the correct parent view controller.
+                    """
+                )
+
+                // Begin the transition: Signal the new vc will begin moving in, and the old one, out.
+
+                parent.addChild(new)
+
+                if
+                    parent.isViewLoaded,
+                    old.isViewLoaded,
+                    let container = old.view.superview
+                {
+                    // We will only add the view to the hierarchy if
+                    // the parent's view is loaded, and the existing view
+                    // is loaded, and the old view was in a superview.
+
+                    // The view should end up with the same frame.
+
+                    new.view.frame = old.view.frame
+
+                    container.addSubview(new.view, positioned: .above, relativeTo: old.view)
+                    old.view.removeFromSuperview()
+                }
+
+                // Finish the transition by signaling the vc they've fully moved in / out.
+                old.removeFromParent()
+            }
+
+            onChange(new)
+        }
+    }
+}
+
+public protocol UpdateChildScreenViewController {}
+
+extension NSViewController: UpdateChildScreenViewController {}
+
 #endif

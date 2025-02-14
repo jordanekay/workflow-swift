@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-#if canImport(UIKit)
 import Foundation
-import UIKit
 
 /// Protocol that describes an observable 'event' that may be emitted from `WorkflowUI`.
 @_spi(ExperimentalObservation)
 public protocol WorkflowUIEvent {
-    var viewController: UIViewController { get }
+    var viewController: ViewController { get }
 }
 
 // MARK: ViewController Lifecycle Events
@@ -29,19 +27,19 @@ public protocol WorkflowUIEvent {
 /// Event emitted from a `WorkflowUIViewController`'s `viewWillLayoutSubviews` method.
 @_spi(ExperimentalObservation)
 public struct ViewWillLayoutSubviewsEvent: WorkflowUIEvent, Equatable {
-    public let viewController: UIViewController
+    public let viewController: ViewController
 }
 
 /// Event emitted from a `WorkflowUIViewController`'s `viewDidLayoutSubviews` method.
 @_spi(ExperimentalObservation)
 public struct ViewDidLayoutSubviewsEvent: WorkflowUIEvent, Equatable {
-    public let viewController: UIViewController
+    public let viewController: ViewController
 }
 
 /// Event emitted from a `WorkflowUIViewController`'s `viewWillAppear` method.
 @_spi(ExperimentalObservation)
 public struct ViewWillAppearEvent: WorkflowUIEvent, Equatable {
-    public let viewController: UIViewController
+    public let viewController: ViewController
     public let animated: Bool
     public let isFirstAppearance: Bool
 }
@@ -49,7 +47,7 @@ public struct ViewWillAppearEvent: WorkflowUIEvent, Equatable {
 /// Event emitted from a `WorkflowUIViewController`'s `viewDidAppear` method.
 @_spi(ExperimentalObservation)
 public struct ViewDidAppearEvent: WorkflowUIEvent, Equatable {
-    public let viewController: UIViewController
+    public let viewController: ViewController
     public let animated: Bool
     public let isFirstAppearance: Bool
 }
@@ -57,14 +55,13 @@ public struct ViewDidAppearEvent: WorkflowUIEvent, Equatable {
 /// Event emitted from a `WorkflowUIViewController`'s `viewWillDisappear` method.
 @_spi(ExperimentalObservation)
 public struct ViewWillDisappearEvent: WorkflowUIEvent, Equatable {
-    public let viewController: UIViewController
+    public let viewController: ViewController
     public let animated: Bool
 }
 
 /// Event emitted from a `WorkflowUIViewController`'s `viewDidDisappear` method.
 @_spi(ExperimentalObservation)
 public struct ViewDidDisappearEvent: WorkflowUIEvent, Equatable {
-    public let viewController: UIViewController
+    public let viewController: ViewController
     public let animated: Bool
 }
-#endif

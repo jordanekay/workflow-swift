@@ -15,6 +15,7 @@
  */
 
 #if canImport(UIKit)
+
 import Foundation
 import UIKit
 
@@ -91,4 +92,84 @@ open class WorkflowUIViewController: UIViewController {
         )
     }
 }
+
+#elseif canImport(AppKit)
+
+import Foundation
+import AppKit
+
+/// Ancestor type from which all ViewControllers in WorkflowUI inherit.
+open class WorkflowNSViewController: NSViewController {
+    /// Set to `true` once `viewDidAppear` has been called
+    public private(set) final var hasViewAppeared: Bool = false
+
+    // MARK: Event Emission
+
+    /// Observation event emission point.
+    /// - Parameter event: The event forwarded to any observers.
+    @_spi(ExperimentalObservation)
+    public final func sendObservationEvent(
+        _ event: @autoclosure () -> some WorkflowUIEvent
+    ) {
+        WorkflowUIObservation
+            .sharedUIObserver?
+            .observeEvent(event())
+    }
+
+    // MARK: Lifecycle Methods
+
+    override open func viewWillAppear() {
+        sendObservationEvent(ViewWillAppearEvent(
+            viewController: self,
+            animated: false,
+            isFirstAppearance: !hasViewAppeared
+        ))
+        super.viewWillAppear()
+    }
+
+    override open func viewDidAppear() {
+        let isFirstAppearance = !hasViewAppeared
+        if isFirstAppearance { hasViewAppeared = true }
+
+        super.viewDidAppear()
+
+        sendObservationEvent(ViewDidAppearEvent(
+            viewController: self,
+            animated: false,
+            isFirstAppearance: isFirstAppearance
+        ))
+    }
+
+    override open func viewWillDisappear() {
+        sendObservationEvent(ViewWillDisappearEvent(
+            viewController: self,
+            animated: false
+        ))
+        super.viewWillDisappear()
+    }
+
+    override open func viewDidDisappear() {
+        super.viewDidDisappear()
+
+        sendObservationEvent(ViewDidDisappearEvent(
+            viewController: self,
+            animated: false
+        ))
+    }
+
+    override open func viewWillLayout() {
+        sendObservationEvent(
+            ViewWillLayoutSubviewsEvent(viewController: self)
+        )
+        super.viewWillLayout()
+    }
+
+    override open func viewDidLayout() {
+        super.viewDidLayout()
+        sendObservationEvent(
+            ViewDidLayoutSubviewsEvent(viewController: self)
+        )
+    }
+}
+
 #endif

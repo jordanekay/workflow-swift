@@ -7,8 +7,8 @@ import PackageDescription
 let package = Package(
     name: "Workflow",
     platforms: [
-        .iOS(.v15),
-        .macOS(.v12),
+        .iOS(.v12),
+        .macOS(.v11),
         .watchOS(.v8),
         .macCatalyst(.v15),
         .tvOS(.v12),

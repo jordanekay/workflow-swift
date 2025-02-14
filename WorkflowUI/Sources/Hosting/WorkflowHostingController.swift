@@ -217,4 +217,178 @@ extension WorkflowHostingController: SingleScreenContaining {
     }
 }
 
+#elseif canImport(AppKit)
+
+import ReactiveSwift
+import AppKit
+@_spi(ViewEnvironmentWiring) import ViewEnvironmentUI
+import Workflow
+
+/// Drives view controllers from a root Workflow.
+public final class WorkflowHostingController<ScreenType, Output>: WorkflowNSViewController where ScreenType: Screen {
+    public typealias CustomizeEnvironment = (inout ViewEnvironment) -> Void
+
+    /// Emits output events from the bound workflow.
+    public var output: Signal<Output, Never> {
+        workflowHost.output
+    }
+
+    /// An environment customization that will be applied to the environment of the root screen.
+    public var customizeEnvironment: CustomizeEnvironment {
+        didSet { setNeedsEnvironmentUpdate() }
+    }
+
+    /// The currently displayed screen - the most recent rendering from the hosted workflow
+    public var screen: ScreenType {
+        workflowHost.rendering.value
+    }
+
+    private(set) var rootViewController: NSViewController
+
+    private let workflowHost: WorkflowHost<AnyWorkflow<ScreenType, Output>>
+
+    private let (lifetime, token) = Lifetime.make()
+
+    private var lastEnvironmentAncestorPath: EnvironmentAncestorPath?
+
+    public init<W: AnyWorkflowConvertible>(
+        workflow: W,
+        customizeEnvironment: @escaping CustomizeEnvironment = { _ in },
+        observers: [WorkflowObserver] = []
+    ) where W.Rendering == ScreenType, W.Output == Output {
+        self.workflowHost = WorkflowHost(
+            workflow: workflow.asAnyWorkflow(),
+            observers: observers
+        )
+
+        self.customizeEnvironment = customizeEnvironment
+
+        var customizedEnvironment: ViewEnvironment = .empty
+        customizeEnvironment(&customizedEnvironment)
+
+        self.rootViewController = workflowHost
+            .rendering
+            .value
+            .viewControllerDescription(environment: customizedEnvironment)
+            .buildViewController()
+
+        super.init(nibName: nil, bundle: nil)
+
+        // Do not automatically forward environment did change notifications to the rendered screen's backing view
+        // controller. Instead rely on `ViewControllerDescription` to call `setNeedsEnvironmentUpdate()` when updates
+        // occur.
+        environmentDescendantsOverride = { [] }
+
+        addChild(rootViewController)
+
+        workflowHost
+            .rendering
+            .signal
+            .take(during: lifetime)
+            .observeValues { [weak self] screen in
+                guard let self else { return }
+
+                update(
+                    screen: screen,
+                    environmentAncestorPath: environmentAncestorPath
+                )
+            }
+    }
+
+    /// Updates the root Workflow in this container.
+    public func update<W: AnyWorkflowConvertible>(workflow: W) where W.Rendering == ScreenType, W.Output == Output {
+        workflowHost.update(workflow: workflow.asAnyWorkflow())
+    }
+
+    @available(*, unavailable)
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func update(screen: ScreenType, environmentAncestorPath: EnvironmentAncestorPath) {
+        lastEnvironmentAncestorPath = environmentAncestorPath
+
+        let environment = environment
+        let previousRoot = rootViewController
+
+        update(child: \.rootViewController, with: screen, in: environment)
+
+        if previousRoot !== rootViewController {
+            // If a new view controller was instantiated and added as a child we need to inform it that the environment
+            // should be re-requested in order to respond to customizations in this WorkflowHostingController or any
+            // view controller above it in the UIViewController hierarchy.
+            setNeedsEnvironmentUpdate()
+        }
+
+        updatePreferredContentSizeIfNeeded()
+    }
+
+    override public func viewDidLoad() {
+        super.viewDidLoad()
+
+        rootViewController.view.frame = view.bounds
+        view.addSubview(rootViewController.view)
+
+        updatePreferredContentSizeIfNeeded()
+    }
+
+    override public func viewWillLayout() {
+        super.viewWillLayout()
+
+        let environmentAncestorPath = environmentAncestorPath
+        if environmentAncestorPath != lastEnvironmentAncestorPath {
+            update(
+                screen: workflowHost.rendering.value,
+                environmentAncestorPath: environmentAncestorPath
+            )
+        }
+    }
+
+    override public func viewDidLayout() {
+        defer { super.viewDidLayout() }
+        rootViewController.view.frame = view.bounds
+    }
+
+    public override func preferredContentSizeDidChange(
+        for viewController: NSViewController
+    ) {
+        super.preferredContentSizeDidChange(for: viewController)
+
+        guard viewController === rootViewController else { return }
+
+        updatePreferredContentSizeIfNeeded()
+    }
+
+    private func updatePreferredContentSizeIfNeeded() {
+        let newPreferredContentSize = rootViewController.preferredContentSize
+
+        guard newPreferredContentSize != preferredContentSize else { return }
+
+        preferredContentSize = newPreferredContentSize
+    }
+}
+
+extension WorkflowHostingController: ViewEnvironmentObserving {
+    public func customize(environment: inout ViewEnvironment) {
+        customizeEnvironment(&environment)
+    }
+
+    public func environmentDidChange() {
+        update(
+            screen: workflowHost.rendering.value,
+            environmentAncestorPath: environmentAncestorPath
+        )
+    }
+}
+
+// MARK: SingleScreenContaining
+
+extension WorkflowHostingController: SingleScreenContaining {
+    public var primaryScreen: any Screen {
+        workflowHost.rendering.value
+    }
+}
+
+
 #endif
+
