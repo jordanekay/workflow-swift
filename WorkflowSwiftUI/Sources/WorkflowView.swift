@@ -1,41 +1,102 @@
 import SwiftUI
 import Workflow
 import WorkflowUI
+import ReactiveSwift
 
 #if canImport(UIKit)
 
 public struct WorkflowView<WorkflowType: Workflow>: UIViewControllerRepresentable where WorkflowType.Rendering: ObservableScreen {
 	private let workflow: WorkflowType
+    private let onOutput: ((WorkflowType.Output) -> Void)?
 
-	public init(workflow: WorkflowType) {
+	public init(
+        workflow: WorkflowType,
+        onOutput: @escaping (WorkflowType.Output) -> Void
+    ) {
 		self.workflow = workflow
+        self.onOutput = onOutput
 	}
+
+    public init(workflow: WorkflowType) where WorkflowType.Output == Never {
+        self.workflow = workflow
+        onOutput = nil
+    }
 
 	public func makeUIViewController(context: Context) -> WorkflowHostingController<WorkflowType.Rendering, WorkflowType.Output> {
-		.init(workflow: workflow)
+        let controller = WorkflowHostingController(workflow: workflow)
+
+        if let onOutput {
+            context.coordinator.outputDisposable?.dispose()
+            context.coordinator.outputDisposable = controller.output.observeValues(onOutput)
+        }
+
+        return controller
 	}
 
-	public func updateUIViewController(_ uiViewController: WorkflowHostingController<WorkflowType.Rendering, WorkflowType.Output>, context: Context) {
-		uiViewController.update(workflow: workflow)
+	public func updateUIViewController(_ controller: WorkflowHostingController<WorkflowType.Rendering, WorkflowType.Output>, context: Context) {
+        if let onOutput {
+            context.coordinator.outputDisposable?.dispose()
+            context.coordinator.outputDisposable = controller.output.observeValues(onOutput)
+        }
+
+        controller.update(workflow: workflow)
 	}
+
+    public func makeCoordinator() -> Coordinator {
+        .init()
+    }
+
+    public final class Coordinator {
+        var outputDisposable: Disposable?
+    }
 }
 
 #elseif canImport(AppKit)
 
 public struct WorkflowView<WorkflowType: Workflow>: NSViewControllerRepresentable where WorkflowType.Rendering: ObservableScreen {
-	private let workflow: WorkflowType
+    private let workflow: WorkflowType
+    private let onOutput: ((WorkflowType.Output) -> Void)?
 
-	public init(workflow: WorkflowType) {
-		self.workflow = workflow
-	}
+    public init(
+        workflow: WorkflowType,
+        onOutput: @escaping (WorkflowType.Output) -> Void
+    ) {
+        self.workflow = workflow
+        self.onOutput = onOutput
+    }
 
-	public func makeNSViewController(context: Context) -> WorkflowHostingController<WorkflowType.Rendering, WorkflowType.Output> {
-		.init(workflow: workflow)
-	}
+    public init(workflow: WorkflowType) where WorkflowType.Output == Never {
+        self.workflow = workflow
+        onOutput = nil
+    }
 
-	public func updateNSViewController(_ nsViewController: WorkflowHostingController<WorkflowType.Rendering, WorkflowType.Output>, context: Context) {
-		nsViewController.update(workflow: workflow)
-	}
+    public func makeNSViewController(context: Context) -> WorkflowHostingController<WorkflowType.Rendering, WorkflowType.Output> {
+        let controller = WorkflowHostingController(workflow: workflow)
+
+        if let onOutput {
+            context.coordinator.outputDisposable?.dispose()
+            context.coordinator.outputDisposable = controller.output.observeValues(onOutput)
+        }
+
+        return controller
+    }
+
+    public func updateNSViewController(_ controller: WorkflowHostingController<WorkflowType.Rendering, WorkflowType.Output>, context: Context) {
+        if let onOutput {
+            context.coordinator.outputDisposable?.dispose()
+            context.coordinator.outputDisposable = controller.output.observeValues(onOutput)
+        }
+
+        controller.update(workflow: workflow)
+    }
+
+    public func makeCoordinator() -> Coordinator {
+        .init()
+    }
+
+    public final class Coordinator {
+        var outputDisposable: Disposable?
+    }
 }
 
 #endif
