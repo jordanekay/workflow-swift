@@ -16,6 +16,7 @@ extension ObservableScreen {
     /// - Parameter makeModel: A closure to create the screen's model. The provided `context` param
     ///   is a convenience to generate dummy sinks and state accessors.
     /// - Returns: A View for previews.
+    @MainActor
     public static func observableScreenPreview(makeModel: (StaticStorePreviewContext) -> Model) -> some View {
         let store = Store<Model>.preview(makeModel: makeModel)
         return Self.makeView(store: store)
@@ -29,6 +30,7 @@ extension ObservableScreen {
     ///
     /// - Parameter state: The state of the screen.
     /// - Returns: A View for previews.
+    @MainActor
     public static func observableScreenPreview<S, A>(state: S) -> some View where Model == ActionModel<S, A> {
         observableScreenPreview { context in
             context.makeActionModel(state: state)
@@ -43,6 +45,7 @@ extension ObservableScreen {
     ///
     /// - Parameter state: The state of the screen.
     /// - Returns: A View for previews.
+    @MainActor
     public static func observableScreenPreview<S>(state: S) -> some View where Model == StateAccessor<S> {
         observableScreenPreview { context in
             context.makeStateAccessor(state: state)

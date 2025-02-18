@@ -32,7 +32,7 @@ public protocol ObservableScreen: Screen {
     /// Constructs the root view for this screen. This is only called once to initialize the view.
     /// After the initial construction, the view will be updated by injecting new values into the
     /// store.
-    @ViewBuilder
+    @MainActor @ViewBuilder
     static func makeView(store: Store<Model>) -> Content
 }
 
@@ -41,6 +41,7 @@ extension ObservableScreen {
 }
 
 extension ObservableScreen {
+    @MainActor
     public func viewControllerDescription(environment: ViewEnvironment) -> ViewControllerDescription {
         ViewControllerDescription(
             type: ModeledHostingController<Model, Content>.self,
@@ -239,7 +240,7 @@ public protocol ObservableScreen: Screen {
     /// Constructs the root view for this screen. This is only called once to initialize the view.
     /// After the initial construction, the view will be updated by injecting new values into the
     /// store.
-    @ViewBuilder
+    @MainActor @ViewBuilder
     static func makeView(store: Store<Model>) -> Content
 }
 
@@ -248,6 +249,7 @@ extension ObservableScreen {
 }
 
 extension ObservableScreen {
+    @MainActor
     public func viewControllerDescription(environment: ViewEnvironment) -> ViewControllerDescription {
         ViewControllerDescription(
             type: ModeledHostingController<Model, Content>.self,

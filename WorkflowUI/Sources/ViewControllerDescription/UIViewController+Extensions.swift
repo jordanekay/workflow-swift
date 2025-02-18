@@ -32,6 +32,7 @@ extension UpdateChildScreenViewController where Self: UIViewController {
     /// - parameter environment: The `environment` to used when updating the view controller.
     /// - parameter onChange: A callback called if the view controller instance changed.
     ///
+    @MainActor
     public func update<VC: UIViewController>(
         child: ReferenceWritableKeyPath<Self, VC>,
         with screen: some Screen,
@@ -139,6 +140,7 @@ extension UpdateChildScreenViewController where Self: NSViewController {
     /// - parameter environment: The `environment` to used when updating the view controller.
     /// - parameter onChange: A callback called if the view controller instance changed.
     ///
+    @MainActor
     public func update<VC: NSViewController>(
         child: ReferenceWritableKeyPath<Self, VC>,
         with screen: some Screen,
