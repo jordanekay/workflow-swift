@@ -104,7 +104,7 @@ private struct TestView: View {
     var store: Store<StateAccessor<State>>
 
     var body: some View {
-        WithPerceptionTracking {
+        withObservationTracking {
             if store.axes.isEmpty {
                 box
             } else {

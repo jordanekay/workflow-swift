@@ -1,15 +1,14 @@
 import Foundation
-import Perception
 import SwiftUI
 import ViewEnvironment
 import Workflow
 import WorkflowSwiftUI
 
 struct MultiCounterView: View {
-    @Perception.Bindable var store: Store<MultiCounterModel>
+    @Bindable var store: Store<MultiCounterModel>
 
     var body: some View {
-        WithPerceptionTracking {
+        withObservationTracking {
             let _ = print("Evaluated MultiCounterView body")
             VStack {
                 Text("Multi Counter Demo")

@@ -3,7 +3,6 @@
 
 import CasePaths
 import IdentifiedCollections
-import Perception
 import WorkflowSwiftUI
 import XCTest
 
@@ -12,7 +11,7 @@ final class ObservableStateTests: XCTestCase {
         var state = ChildState()
         let countDidChange = expectation(description: "count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.count
         } onChange: {
             countDidChange.fulfill()
@@ -27,12 +26,12 @@ final class ObservableStateTests: XCTestCase {
         var state = ParentState()
         let childCountDidChange = expectation(description: "child.count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.child.count
         } onChange: {
             childCountDidChange.fulfill()
         }
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.child
         } onChange: {
             XCTFail("state.child should not change.")
@@ -48,12 +47,12 @@ final class ObservableStateTests: XCTestCase {
         let childDidChange = expectation(description: "child.didChange")
 
         let child = state.child
-        withPerceptionTracking {
+        withObservationTracking {
             _ = child.count
         } onChange: {
             XCTFail("child.count should not change.")
         }
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.child
         } onChange: {
             childDidChange.fulfill()
@@ -68,7 +67,7 @@ final class ObservableStateTests: XCTestCase {
         var state = ParentState()
         let childDidChange = expectation(description: "child.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.child
         } onChange: {
             childDidChange.fulfill()
@@ -83,7 +82,7 @@ final class ObservableStateTests: XCTestCase {
         var state = ParentState(child: ChildState(count: 42))
         let childDidChange = expectation(description: "child.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.child
         } onChange: {
             childDidChange.fulfill()
@@ -102,12 +101,12 @@ final class ObservableStateTests: XCTestCase {
         let childDidChange = expectation(description: "child.didChange")
         let siblingDidChange = expectation(description: "sibling.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.child
         } onChange: {
             childDidChange.fulfill()
         }
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.sibling
         } onChange: {
             siblingDidChange.fulfill()
@@ -126,7 +125,7 @@ final class ObservableStateTests: XCTestCase {
             var state = ParentState(optional: nil)
             let optionalDidChange = expectation(description: "optional.didChange")
 
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = state.optional
             } onChange: {
                 optionalDidChange.fulfill()
@@ -142,7 +141,7 @@ final class ObservableStateTests: XCTestCase {
             var state = ParentState(optional: nil)
             let optionalDidChange = expectation(description: "optional.didChange")
 
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = state.optional
             } onChange: {
                 optionalDidChange.fulfill()
@@ -158,7 +157,7 @@ final class ObservableStateTests: XCTestCase {
             var state = ParentState(optional: ChildState())
             let optionalDidChange = expectation(description: "optional.didChange")
 
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = state.optional
             } onChange: {
                 optionalDidChange.fulfill()
@@ -174,13 +173,13 @@ final class ObservableStateTests: XCTestCase {
         var state = ParentState(optional: ChildState())
         let optionalCountDidChange = expectation(description: "optional.count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.optional
         } onChange: {
             XCTFail("Optional should not change")
         }
         let optional = state.optional
-        withPerceptionTracking {
+        withObservationTracking {
             _ = optional?.count
         } onChange: {
             optionalCountDidChange.fulfill()
@@ -198,7 +197,7 @@ final class ObservableStateTests: XCTestCase {
         var state = ParentState(child: childState, sibling: childStateCopy)
         let childCountDidChange = expectation(description: "child.count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.child.count
         } onChange: {
             childCountDidChange.fulfill()
@@ -215,7 +214,7 @@ final class ObservableStateTests: XCTestCase {
         var state = ParentState()
         let rowsDidChange = expectation(description: "rowsDidChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.rows
         } onChange: {
             rowsDidChange.fulfill()
@@ -233,22 +232,22 @@ final class ObservableStateTests: XCTestCase {
         ])
         let firstRowCountDidChange = expectation(description: "firstRowCountDidChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.rows
         } onChange: {
             XCTFail("rows should not change")
         }
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.rows[0]
         } onChange: {
             XCTFail("rows[0] should not change")
         }
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.rows[0].count
         } onChange: {
             firstRowCountDidChange.fulfill()
         }
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.rows[1].count
         } onChange: {
             XCTFail("rows[1].count should not change")
@@ -265,7 +264,7 @@ final class ObservableStateTests: XCTestCase {
         childCopy.count = 42
         let childCountDidChange = expectation(description: "childCountDidChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.child.count
         } onChange: {
             childCountDidChange.fulfill()
@@ -280,7 +279,7 @@ final class ObservableStateTests: XCTestCase {
         var state = ParentState()
         let childrenDidChange = expectation(description: "childrenDidChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.children
         } onChange: {
             childrenDidChange.fulfill()
@@ -293,7 +292,7 @@ final class ObservableStateTests: XCTestCase {
     func testArrayMutate() {
         var state = ParentState(children: [ChildState()])
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = state.children
         } onChange: {
             XCTFail("children should not change")

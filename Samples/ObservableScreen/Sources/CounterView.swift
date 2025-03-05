@@ -10,7 +10,7 @@ struct CounterView: View {
 
     var body: some View {
         let _ = Self._printChanges()
-        WithPerceptionTracking {
+        withObservationTracking {
             let _ = print("Evaluated CounterView[\(key)] body")
             HStack {
                 Text(store.info.name)

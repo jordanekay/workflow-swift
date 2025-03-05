@@ -1,6 +1,6 @@
 # WorkflowSwiftUI Adoption Guide
 
-`WorkflowSwiftUI` is designed with performance in mind. Instead of updating the entire UI on every render loop, `WorkflowSwiftUI` uses the [Perception](https://github.com/pointfreeco/swift-perception) framework (a backport of Apple's Observation), to detect the data that each view is dependent on, and to only re-evaluate those views when that data has changed.
+`WorkflowSwiftUI` is designed with performance in mind. Instead of updating the entire UI on every render loop, `WorkflowSwiftUI` uses Observation to detect the data that each view is dependent on, and to only re-evaluate those views when that data has changed.
 
 In order to support this, `WorkflowSwiftUI` has some additional restrictions and subtle departures from practices you may be used to.
 
@@ -187,8 +187,6 @@ struct CustomModel: ObservableModel {
 
 In your View, you’ll access state and sinks via a property of type `Store<Model>`. This type wraps the model that your workflow renders, and provides conveniences for access the state, sinks, and child stores.
 
-If targeting iOS 16 or below, you’ll need to wrap your view’s body in `WithPerceptionTracking`. This is a component of the `Perception` backport that allows observation to work on iOS before iOS 17.
-
 ```swift
 struct PersonState {
   var name: String
@@ -205,7 +203,7 @@ struct PersonView: View {
   let store: Store<PersonModel>
   
   var body: some View {
-    WithPerceptionTracking {
+    withObservationTracking {
       VStack {
         Text("Name: \(store.name)")
         Text("Age: \(store.age)")
@@ -219,7 +217,7 @@ struct PersonView: View {
 }
 ```
 
-If you forget to wrap your view's body in `WithPerceptionTracking`, a runtime warning will remind you.
+If you forget to wrap your view's body in `withObservationTracking`, a runtime warning will remind you.
 
 ## Screens
 
@@ -361,7 +359,7 @@ struct CustomView: View {
   let store: Store<Model>
   
   var body: some View {
-    WithPerceptionTracking {
+    withObservationTracking {
       VStack {
         Button("Increment") {
           store.up.send(.increment)
@@ -377,7 +375,7 @@ struct CustomView: View {
 
 ## Bindings
 
-For state properties that are writable, an automatic `Binding` can be derived by annotating the store with `@Bindable`. These bindings will use the workflow's state mutation sink. If you’re targeting iOS 16 or lower, you should use `@Perception.Bindable`.
+For state properties that are writable, an automatic `Binding` can be derived by annotating the store with `@Bindable`. These bindings will use the workflow's state mutation sink. If you’re targeting iOS 16 or lower, you should use `Bindable`.
 
 All properties can be turned into bindings by appending the `sending()` function to specify the “write” action. For properties that are already writable, this will refine the binding to send a custom action instead of the built-in state mutation sink.
 
@@ -404,10 +402,10 @@ enum Action: WorkflowAction {
 typealias Model = ActionModel<State, Action>
 
 struct ContentView: View {
-  @Perception.Bindable var store: Store<Model>
+  @Bindable var store: Store<Model>
 
   var body: some View {
-    WithPerceptionTracking {
+    withObservationTracking {
       // synthesized binding
       Toggle("X?", isOn: $store.isX)
       // binding with a custom setter action

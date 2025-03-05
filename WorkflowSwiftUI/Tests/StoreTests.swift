@@ -1,6 +1,5 @@
 import CasePaths
 import IdentifiedCollections
-import Perception
 import SwiftUI
 import Workflow
 import XCTest
@@ -14,7 +13,7 @@ final class StoreTests: XCTestCase {
         }
         let (store, _) = Store.make(model: model)
 
-        withPerceptionTracking {
+        withObservationTracking {
             XCTAssertEqual(store.count, 0)
         } onChange: {
             XCTFail("State should not have been mutated")
@@ -30,13 +29,13 @@ final class StoreTests: XCTestCase {
 
         let countDidChange = expectation(description: "count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             countDidChange.fulfill()
         }
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.child.name
         } onChange: {
             XCTFail("child.name should not change")
@@ -56,13 +55,13 @@ final class StoreTests: XCTestCase {
 
         let childNameDidChange = expectation(description: "child.name.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             XCTFail("count should not change")
         }
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.child.name
         } onChange: {
             childNameDidChange.fulfill()
@@ -83,7 +82,7 @@ final class StoreTests: XCTestCase {
 
         let countDidChange = expectation(description: "count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             countDidChange.fulfill()
@@ -136,7 +135,7 @@ final class StoreTests: XCTestCase {
         let (store, _) = Store.make(model: model)
 
         let countDidChange = expectation(description: "count.didChange")
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             countDidChange.fulfill()
@@ -167,7 +166,7 @@ final class StoreTests: XCTestCase {
         let (store, _) = Store.make(model: model)
 
         let countDidChange = expectation(description: "count.didChange")
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             countDidChange.fulfill()
@@ -205,7 +204,7 @@ final class StoreTests: XCTestCase {
             let (store, _) = Store.make(model: model)
 
             let countDidChange = expectation(description: "count.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.count
             } onChange: {
                 countDidChange.fulfill()
@@ -231,7 +230,7 @@ final class StoreTests: XCTestCase {
             let (store, _) = Store.make(model: model)
 
             let countDidChange = expectation(description: "count.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.count
             } onChange: {
                 countDidChange.fulfill()
@@ -260,7 +259,7 @@ final class StoreTests: XCTestCase {
             let (store, _) = Store.make(model: model)
 
             let countDidChange = expectation(description: "count.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.count
             } onChange: {
                 countDidChange.fulfill()
@@ -291,7 +290,7 @@ final class StoreTests: XCTestCase {
         let (store, _) = Store.make(model: model)
 
         let childAgeDidChange = expectation(description: "child.age.didChange")
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.child.age
         } onChange: {
             childAgeDidChange.fulfill()
@@ -330,7 +329,7 @@ final class StoreTests: XCTestCase {
             setModel(model)
 
             let optionalDidChange = expectation(description: "optional.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.optional
             } onChange: {
                 optionalDidChange.fulfill()
@@ -355,7 +354,7 @@ final class StoreTests: XCTestCase {
             setModel(model)
 
             let optionalDidChange = expectation(description: "optional.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.optional
             } onChange: {
                 optionalDidChange.fulfill()
@@ -379,14 +378,14 @@ final class StoreTests: XCTestCase {
             model.optional = childModel
             setModel(model)
 
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.optional
             } onChange: {
                 XCTFail("optional should not change")
             }
 
             let optionalAgeDidChange = expectation(description: "optional.age.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.optional?.age
             } onChange: {
                 optionalAgeDidChange.fulfill()
@@ -413,7 +412,7 @@ final class StoreTests: XCTestCase {
             model.optional = nil
             setModel(model)
 
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.optional
             } onChange: {
                 XCTFail("optional should not change")
@@ -465,7 +464,7 @@ final class StoreTests: XCTestCase {
             setModel(model)
 
             let arrayDidChange = expectation(description: "array.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.array
             } onChange: {
                 arrayDidChange.fulfill()
@@ -488,7 +487,7 @@ final class StoreTests: XCTestCase {
             setModel(model)
 
             let arrayDidChange = expectation(description: "array.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.array
             } onChange: {
                 arrayDidChange.fulfill()
@@ -510,14 +509,14 @@ final class StoreTests: XCTestCase {
             model.array = childModels
             setModel(model)
 
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.array
             } onChange: {
                 XCTFail("array should not change")
             }
 
             let array0AgeDidChange = expectation(description: "array[0].age.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.array[0].age
             } onChange: {
                 array0AgeDidChange.fulfill()
@@ -569,7 +568,7 @@ final class StoreTests: XCTestCase {
             setModel(model)
 
             let identifiedDidChange = expectation(description: "identified.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.identified
             } onChange: {
                 identifiedDidChange.fulfill()
@@ -598,7 +597,7 @@ final class StoreTests: XCTestCase {
             setModel(model)
 
             let arrayDidChange = expectation(description: "identified.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.identified
             } onChange: {
                 arrayDidChange.fulfill()
@@ -626,14 +625,14 @@ final class StoreTests: XCTestCase {
             model.identified = childModels
             setModel(model)
 
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.identified
             } onChange: {
                 XCTFail("identified should not change")
             }
 
             let identified0AgeDidChange = expectation(description: "identified[0].age.didChange")
-            withPerceptionTracking {
+            withObservationTracking {
                 _ = store.identified[0].age
             } onChange: {
                 identified0AgeDidChange.fulfill()
@@ -659,11 +658,11 @@ final class StoreTests: XCTestCase {
             update(&state)
         }
         let (_store, _) = Store.make(model: model)
-        @Perception.Bindable var store = _store
+        @Bindable var store = _store
 
         let countDidChange = expectation(description: "count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             countDidChange.fulfill()
@@ -693,11 +692,11 @@ final class StoreTests: XCTestCase {
             }
         )
         let (_store, _) = Store.make(model: model)
-        @Perception.Bindable var store = _store
+        @Bindable var store = _store
 
         let countDidChange = expectation(description: "count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             countDidChange.fulfill()
@@ -722,11 +721,11 @@ final class StoreTests: XCTestCase {
             }
         )
         let (_store, _) = Store.make(model: model)
-        @Perception.Bindable var store = _store
+        @Bindable var store = _store
 
         let countDidChange = expectation(description: "count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             countDidChange.fulfill()
@@ -756,11 +755,11 @@ final class StoreTests: XCTestCase {
             }.send
         )
         let (_store, _) = Store.make(model: model)
-        @Perception.Bindable var store = _store
+        @Bindable var store = _store
 
         let countDidChange = expectation(description: "count.didChange")
 
-        withPerceptionTracking {
+        withObservationTracking {
             _ = store.count
         } onChange: {
             countDidChange.fulfill()
