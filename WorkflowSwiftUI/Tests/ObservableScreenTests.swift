@@ -75,7 +75,7 @@ private struct TestKeyEmittingScreen: ObservableScreen {
         var store: Store<Model>
 
         var body: some View {
-            WithPerceptionTracking {
+            withObservationTracking {
                 let _ = { store.emittedValue = testValue }()
                 Color.clear
                     .frame(width: 1, height: 1)

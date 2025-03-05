@@ -7,8 +7,8 @@ import PackageDescription
 let package = Package(
     name: "Workflow",
     platforms: [
-        .iOS(.v14),
-        .macOS(.v11),
+        .iOS(.v17),
+        .macOS(.v14),
         .watchOS(.v8),
         .macCatalyst(.v15),
         .tvOS(.v12),
@@ -24,6 +24,11 @@ let package = Package(
         .singleTargetLibrary("WorkflowUI"),
         .singleTargetLibrary("WorkflowSwiftUI"),
 
+        // MARK: WorkflowConcurrency
+
+        .singleTargetLibrary("WorkflowConcurrency"),
+        .singleTargetLibrary("WorkflowConcurrencyTesting"),
+
         // MARK: ViewEnvironment
 
         .singleTargetLibrary("ViewEnvironment"),
@@ -37,8 +42,6 @@ let package = Package(
         .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0" ..< "601.0.0-prerelease"),
         .package(url: "https://github.com/pointfreeco/swift-case-paths", from: "1.1.0"),
         .package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "1.0.0"),
-        .package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.4.0"),
-        .package(url: "https://github.com/pointfreeco/swift-perception", from: "1.1.4"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.2.1"),
     ],
     targets: [
@@ -92,7 +95,6 @@ let package = Package(
                 "WorkflowSwiftUIMacros",
                 .product(name: "CasePaths", package: "swift-case-paths"),
                 .product(name: "IdentifiedCollections", package: "swift-identified-collections"),
-                .product(name: "Perception", package: "swift-perception"),
             ],
             path: "WorkflowSwiftUI/Sources"
         ),
@@ -109,13 +111,29 @@ let package = Package(
             ],
             path: "WorkflowSwiftUIMacros/Sources"
         ),
+
+        // MARK: WorkflowConcurrency
+
+        .target(
+            name: "WorkflowConcurrency",
+            dependencies: ["Workflow"],
+            path: "WorkflowConcurrency/Sources"
+        ),
         .testTarget(
-            name: "WorkflowSwiftUIMacrosTests",
-            dependencies: [
-                "WorkflowSwiftUIMacros",
-                .product(name: "MacroTesting", package: "swift-macro-testing"),
-            ],
-            path: "WorkflowSwiftUIMacros/Tests"
+            name: "WorkflowConcurrencyTests",
+            dependencies: ["WorkflowConcurrencyTesting"],
+            path: "WorkflowConcurrency/Tests"
+        ),
+        .target(
+            name: "WorkflowConcurrencyTesting",
+            dependencies: ["WorkflowConcurrency", "WorkflowTesting"],
+            path: "WorkflowConcurrency/Testing",
+            linkerSettings: [.linkedFramework("XCTest")]
+        ),
+        .testTarget(
+            name: "WorkflowConcurrencyTestingTests",
+            dependencies: ["WorkflowConcurrencyTesting"],
+            path: "WorkflowConcurrency/TestingTests"
         ),
 
         // MARK: WorkflowReactiveSwift
