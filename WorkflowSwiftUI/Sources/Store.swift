@@ -117,7 +117,7 @@ extension Store {
         state[keyPath: keyPath]
     }
 
-    public subscript<T>(dynamicMember keyPath: WritableKeyPath<State, T>) -> T {
+    subscript<T>(dynamicMember keyPath: WritableKeyPath<State, T>) -> T {
         get {
             state[keyPath: keyPath]
         }
