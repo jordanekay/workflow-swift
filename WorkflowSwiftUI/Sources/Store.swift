@@ -24,7 +24,7 @@ import Workflow
 /// sink.
 ///
 @dynamicMemberLookup
-public final class Store<Model: ObservableModel>: Observable {
+public final class Store<Model: ObservableModel>: Observable, @unchecked Sendable {
     public typealias State = Model.State
 
     private var model: Model
