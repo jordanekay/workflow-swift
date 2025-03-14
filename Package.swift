@@ -29,6 +29,11 @@ let package = Package(
         .singleTargetLibrary("WorkflowConcurrency"),
         .singleTargetLibrary("WorkflowConcurrencyTesting"),
 
+        // MARK: WorkflowReactiveSwift
+
+        .singleTargetLibrary("WorkflowReactiveSwift"),
+        .singleTargetLibrary("WorkflowReactiveSwiftTesting"),
+
         // MARK: ViewEnvironment
 
         .singleTargetLibrary("ViewEnvironment"),
