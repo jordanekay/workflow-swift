@@ -43,7 +43,7 @@ let package = Package(
         .singleTargetLibrary("ViewEnvironmentUI"),
     ],
     dependencies: [
-        .package(url: "https://github.com/ReactiveCocoa/ReactiveSwift.git", from: "7.1.1"),
+		.package(url: "https://github.com/ReactiveCocoa/ReactiveSwift.git", branch: "swift-concurrency"),
         .package(url: "https://github.com/swiftlang/swift-syntax", "509.0.0" ..< "601.0.0-prerelease"),
         .package(url: "https://github.com/pointfreeco/swift-case-paths", from: "1.1.0"),
         .package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "1.0.0"),
