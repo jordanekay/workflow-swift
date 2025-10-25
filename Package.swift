@@ -22,7 +22,11 @@ let package = Package(
         // MARK: WorkflowUI
 
         .singleTargetLibrary("WorkflowUI"),
+		.singleTargetLibrary("WorkflowMenuUI"),
         .singleTargetLibrary("WorkflowSwiftUI"),
+
+		// MARK: WorkflowContainers
+		.singleTargetLibrary("WorkflowContainers"),
 
         // MARK: WorkflowConcurrency
 
@@ -116,6 +120,22 @@ let package = Package(
             ],
             path: "WorkflowSwiftUIMacros/Sources"
         ),
+
+		// MARK: WorkflowMenuUI
+
+		.target(
+			name: "WorkflowMenuUI",
+			dependencies: ["Workflow", "ViewEnvironment"],
+			path: "WorkflowMenuUI/Sources"
+		),
+
+		// MARK: WorkflowContainers
+
+		.target(
+			name: "WorkflowContainers",
+			dependencies: ["WorkflowUI", "WorkflowMenuUI"],
+			path: "WorkflowContainers/Sources"
+		),
 
         // MARK: WorkflowConcurrency
 
