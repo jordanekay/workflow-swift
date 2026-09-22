@@ -44,7 +44,6 @@ extension Menu {
             }
 
             if self.items != items {
-                items.forEach { $0.menu = nil }
                 self.items = items
             }
         }
