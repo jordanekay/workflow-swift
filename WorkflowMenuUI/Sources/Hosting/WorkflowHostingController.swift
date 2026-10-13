@@ -23,6 +23,7 @@ import ReactiveSwift
 import ViewEnvironment
 
 /// Drives menus from a root Workflow.
+@MainActor
 public final class WorkflowHostingController<ScreenType: Screen, Output> {
 	public let menu: NSMenu
 

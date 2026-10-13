@@ -20,6 +20,7 @@ public extension Menu {
 
 // MARK: -
 extension Menu.Screen: Screen {
+	@MainActor
 	public func menuDescription(environment: ViewEnvironment) -> MenuDescription {
 		Menu.Container.description(for: self, environment: environment)
 	}

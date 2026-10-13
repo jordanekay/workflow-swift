@@ -27,10 +27,12 @@ import ViewEnvironment
 public protocol Screen {
 	/// A menu description that acts as a recipe to either build
 	/// or update a previously-built menu to match this screen.
+	@MainActor
 	func menuDescription(environment: ViewEnvironment) -> MenuDescription
 }
 
 // MARK: -
+@MainActor
 public extension Screen {
 	/// Update the given menu with the content from the screen.
 	///

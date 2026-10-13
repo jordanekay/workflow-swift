@@ -37,6 +37,7 @@ import ViewEnvironment
 ///     }
 /// }
 /// ```
+@MainActor
 open class ScreenMenu<ScreenType: Screen>: NSMenu {
 	public private(set) final var screen: ScreenType
 	public private(set) final var environment: ViewEnvironment

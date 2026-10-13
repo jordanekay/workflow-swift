@@ -34,6 +34,7 @@ public extension AnyScreen {
 		wrappedScreen = screen
 	}
 
+	@MainActor
 	func menuDescription(environment: ViewEnvironment) -> MenuDescription {
 		wrappedScreen.menuDescription(environment: environment)
 	}
